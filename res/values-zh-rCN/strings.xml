@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources
+    >
+    <string name="functionsTitle">功能列表</string>
+    
+    <string name="groupListTitle">群组列表</string>
+    <string name="joinOrexistGroupTitle">群组操作</string>
+    <string name="joinGroupTxt">加入群组</string>
+    <string name="autojoinGroupTxt">自动加入群组</string>
+    <string name="exitGroupTxt">退出群组</string>
+    <string name="cancelTxt">取消</string>
+    <string name="setAsCurrentGroupTxt">设置为当前业务群组</string>
+    
+    <string name="audio_group_call">语音组呼</string>
+    <string name="audio_broadcast">语音多播</string>
+    <string name="audio_point_call">语音点呼</string>
+    
+    <string name="okBtnTxt">确定</string>
+    <string name="cancelBtnTxt">取消</string>
+    <string name="mainlayoutTxt">通话信息</string>
+    <string name="statusTitleTxt">通话状态</string>
+    <string name="operateTxt">通话操作</string>
+    <string name="clearTxt">清除</string>
+</resources>

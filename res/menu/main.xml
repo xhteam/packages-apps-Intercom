@@ -1,0 +1,19 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/audioGroupCall"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/audio_group_call"/>
+    <item
+        android:id="@+id/audioBroadCast"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/audio_broadcast"/>
+    <item
+        android:id="@+id/audioPointCall"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/audio_point_call"/>
+
+</menu>

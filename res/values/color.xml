@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="white">#FFFFFFFF</color>   
+    <color name="lightwhite">#FFFFFFEC</color>   
+    <color name="black">#FF000000</color>
+    <color name="red">#FFFF0000</color>
+    <color name="green">#FF00FF00</color>
+    <color name="blue">#FF0000FF</color>
+    <color name="light_blue">#FF879C3C</color>
+    <color name="yellow">#FFFFFF00</color>
+    <color name="grey">#FFAAAAAA</color>
+	<color name="orange">#FFFFA500</color>
+	<color name="silver">#FFC0C0C0</color>
+	<color name="slidegreen">#4fa5d5</color>
+	
+	<color name="tabcolor">#87CEEB</color>
+	<color name="lightblue">#B4BFD3</color>
+	<color name="darkblue">#47659B</color>
+	<color name="holo_red_light">#ffff4444</color>
+	<color name="holo_blue_bright">#ff00ddff</color>
+	
+</resources>

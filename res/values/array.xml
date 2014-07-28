@@ -1,0 +1,12 @@
+<resources>
+   
+     <string-array name="app_actions">
+        <item>GroupActivity</item>
+        <item>EEPROMActivity</item>
+    </string-array>
+    <string-array name="app_names">
+        <item>群组列表</item>
+        <item>UE状态变更</item>
+    </string-array> 
+
+</resources>
