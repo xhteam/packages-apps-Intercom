@@ -42,7 +42,10 @@ public class IntercomApplication extends Application {
 	private boolean isVideoCall = false;
 	private AI_SERVICE_TYPE aiServiceType;
 	private String bussinessCallNum;
+	private String tun = "";
 	private GroupObject joinedGroupObj;
+	private int groupCallPriority = 15;
+	private int joinGroupPriority = 15;
 	
 	@Override
 	public void onCreate() {
@@ -90,7 +93,6 @@ public class IntercomApplication extends Application {
 		intercom.registerForNetworkVersion(mHandler, Constants.RIL_UNSOL_PTT_NETWORK_VERSION,
 				null);
 		
-
 		groupObjList = new ArrayList<GroupObject>();
 		activeGroupObjList = new ArrayList<GroupObject>();
 		
@@ -109,10 +111,15 @@ public class IntercomApplication extends Application {
 		}
 		int[] dataInfo ;
 		int callType = aiServiceType.ordinal();
-		if (AI_SERVICE_TYPE.AUDIO_GROUP_CALL == aiServiceType ||
+		int callPriority = groupCallPriority;
+		if (groupCallPriority < CALL_PRIORITY_TYPE.PRIORITY_0.ordinal()
+				|| groupCallPriority > CALL_PRIORITY_TYPE.PRIORITY_15.ordinal()){
+			callPriority = CALL_PRIORITY_TYPE.PRIORITY_15.ordinal();
+		}
+			if (AI_SERVICE_TYPE.AUDIO_GROUP_CALL == aiServiceType ||
 				AI_SERVICE_TYPE.AUDIO_GROUP_BROADCAST == aiServiceType) {
 			if (null != joinedGroupObj && true == joinedGroupObj.isJoinedSuccess() ) {
-				dataInfo = new int[] { 0, callType, CALL_PRIORITY_TYPE.PRIORITY_15.ordinal(),
+				dataInfo = new int[] { 0, callType,callPriority ,
 						joinedGroupObj.getGroupId() };
 				intercom.callDial(dataInfo, mHandler
 						.obtainMessage(Constants.RIL_REQUEST_PTT_CALL_DIAL));
@@ -153,8 +160,9 @@ public class IntercomApplication extends Application {
 			public void handleMessage(Message msg) {
 				AsyncResult asyncResult = (AsyncResult)msg.obj;
 				Object obj = asyncResult.result;
-				Intent i ;
+				Intent i ,i2;
 				String statusStr = "";
+				String temp = "";
 				Log.d(TAG, "PTT_TYPE: "+ msg.what);
 				switch(msg.what){
 				case Constants.RIL_UNSOL_PTT_CALL_INDICATOR:
@@ -202,6 +210,7 @@ public class IntercomApplication extends Application {
 					PttGroup pttGroup = (PttGroup) obj;
 					int allGroupNumber = pttGroup.groups_number + pttGroup.dyn_groups_number;
 					List<GroupInfo> groupInfoList = pttGroup.ginfoList;
+					tun = pttGroup.tun;
 					Log.d(TAG,"allGroupNumber: "+allGroupNumber );
 					for (int index = 0; index < allGroupNumber; index++) {
 						GroupObject groupObj = new GroupObject(groupInfoList.get(index).gid,
@@ -216,6 +225,9 @@ public class IntercomApplication extends Application {
 					i = new Intent(Constants.GROUP_LIST_CHANGED_ACTION);
 					sendBroadcast(i);
 					
+					i2 = new Intent(Constants.TUN_UPDATED_ACTION);
+					sendBroadcast(i2);
+					
 					//start join group.
 					if( 0 != groupObjList.size()){
 						requestJoinInGroup(groupObjList.get(0));
@@ -226,7 +238,7 @@ public class IntercomApplication extends Application {
 					//open speaker.
 					//audioControl.setSpeakerphoneOn(true);
 					Log.d(TAG, "RIL_UNSOL_PTT_NOTIFICATION_CALL");
-					audioControl.setInCommunication();
+					audioControl.setAsSpeaker();
 					int[] notificationCallInfo = (int[]) obj;
 					String canGrab = notificationCallInfo[3] == 1 ? "can grab call right"
 							: "can not grab call right. ";
@@ -260,7 +272,6 @@ public class IntercomApplication extends Application {
 					break;
 				case Constants.RIL_UNSOL_PTT_OUTGOING_CALL_PROGRESS:
 					int[] callProgressInfo = (int[]) obj;
-					String temp = "";
 					switch(callProgressInfo[1]){
 					case RIL_UNSOL_PTT_OUTGOING_CALL_PROGRESS_STATUS_TYPE.CALLED_PROGRESSING:
 						temp = "CALLED_PROGRESSING";
@@ -330,6 +341,7 @@ public class IntercomApplication extends Application {
 					sendBroadcast(i);
 					break;
 				case Constants.RIL_REQUEST_PTT_QUERY_BIZ_STATE:
+				case Constants.RIL_UNSOL_PTT_BIZ_INFO:
 					PttInfo pttInfo = (PttInfo)obj;
 					Log.d(TAG, "pttInfo: "+ pttInfo);
 					statusStr = "PTT Business Status: "+ pttInfo.toString();
@@ -371,6 +383,7 @@ public class IntercomApplication extends Application {
 					}
 					break;
 				case Constants.RIL_UNSOL_PTT_DEVICE_INFO:
+				case Constants.RIL_REQUEST_PTT_DEVICE_INFO:
 					int[] deviceInfo = (int[])obj;
 					statusStr = deviceInfo[0] == 1? "PPT VOICE SUPPORT":"PPT VOICE NOT SUPPROT";
 					statusStr += "\n"+ (deviceInfo[1] == 1? "PPT SMS SUPPORT":"PPT SMS NOT SUPPORT");
@@ -390,8 +403,31 @@ public class IntercomApplication extends Application {
 					i.putExtra(Constants.EXTRA_UE_STATUS, statusStr);
 					sendBroadcast(i);						
 					break;
+				case Constants.RIL_UNSOL_PTT_TRUNKING_MODE:
+					dataInfo = (int[])obj;
+					if( 0 == dataInfo[0]){
+						temp = "fei guzhang moshi";
+					}else{
+						temp = "guzhang moshi";
+					}
+					statusStr = "trunking mode: "+ temp;
+					i = new Intent(Constants.STATUS_CHANGED_ACTION);
+					i.putExtra(Constants.EXTRA_UE_STATUS, statusStr);
+					sendBroadcast(i);
+					break;
+				case Constants.RIL_UNSOL_PTT_NOTIFICATION_JOIN_GROUP:
+					dataInfo = (int[])obj;
+					statusStr = "ask to join group, groupId: "+dataInfo[0];
+					i = new Intent(Constants.STATUS_CHANGED_ACTION);
+					i.putExtra(Constants.EXTRA_UE_STATUS, statusStr);
+					sendBroadcast(i);
+					
+					i2 = new Intent(Constants.ASK_TO_JOIN_GROUP_ACTION);
+					i2.putExtra(Constants.EXTRA_GROUPIOD, dataInfo[0]);
+					sendBroadcast(i2);
+					break;
 				case Constants.RIL_UNSOL_PTT_GROUP_RELEASE:
-					String[] releaseGroupInfo = (String[])obj;
+					int[] releaseGroupInfo = (int[])obj;
 					statusStr = "group release , groupId: "+releaseGroupInfo[1];
 					i = new Intent(Constants.STATUS_CHANGED_ACTION);
 					i.putExtra(Constants.EXTRA_UE_STATUS, statusStr);
@@ -479,7 +515,54 @@ public class IntercomApplication extends Application {
 						i = new Intent(Constants.STATUS_CHANGED_ACTION);
 						i.putExtra(Constants.EXTRA_UE_STATUS, statusStr);
 						sendBroadcast(i);
-						break;					
+						break;
+					case Constants.RIL_REQUEST_PTT_QUERY_BLOCKED_INDICATOR:
+						dataInfo = (int[])obj;
+						statusStr = "BLOCKED_INDICATOR: ";
+						switch(dataInfo[0]){
+						case RIL_REQUEST_PTT_QUERY_BLOCKED_INDICATOR_TYPE.IMSI_OPEN_IMEI_OPERN:
+							statusStr += "IMSI_OPEN_IMEI_OPERN";
+							break;
+						case RIL_REQUEST_PTT_QUERY_BLOCKED_INDICATOR_TYPE.IMSI_TEMP_CLOSE_TEMP_IMEI_OPEN:
+							statusStr += "IMSI_TEMP_CLOSE_TEMP_IMEI_OPEN";
+							break;
+						case RIL_REQUEST_PTT_QUERY_BLOCKED_INDICATOR_TYPE.IMSI_CLOSE_FOREVER_IMEI_OPEN:
+							statusStr += "IMSI_CLOSE_FOREVER_IMEI_OPEN";
+							break;
+						case RIL_REQUEST_PTT_QUERY_BLOCKED_INDICATOR_TYPE.IMSI_OPEN_IMEI_CLOSE_TEMP:
+							statusStr += "IMSI_OPEN_IMEI_CLOSE_TEMP";
+							break;
+						case RIL_REQUEST_PTT_QUERY_BLOCKED_INDICATOR_TYPE.IMSI_OPEN_IMEI_CLOSE_FOREVER:
+							statusStr += "IMSI_OPEN_IMEI_CLOSE_FOREVER";
+							break;
+						case RIL_REQUEST_PTT_QUERY_BLOCKED_INDICATOR_TYPE.IMSI_CLOSE_TEMP_IMEI_CLOSE_FOREVER:
+							statusStr += "IMSI_CLOSE_TEMP_IMEI_CLOSE_FOREVER";
+							break;
+						case RIL_REQUEST_PTT_QUERY_BLOCKED_INDICATOR_TYPE.IMSI_CLOSE_FOREVER_IMEI_CLOSE_TEMP:
+							statusStr += "IMSI_CLOSE_FOREVER_IMEI_CLOSE_TEMP";
+							break;
+						case RIL_REQUEST_PTT_QUERY_BLOCKED_INDICATOR_TYPE.IMSI_CLOSE_TEMP_IMEI_CLOSE_TEMP:
+							statusStr += "IMSI_CLOSE_TEMP_IMEI_CLOSE_TEMP";
+							break;
+						case RIL_REQUEST_PTT_QUERY_BLOCKED_INDICATOR_TYPE.IMSI_CLOSE_FOREVER_IMEI_CLOSE_FOREVER:
+							statusStr += "IMSI_CLOSE_FOREVER_IMEI_CLOSE_FOREVER";
+							break;
+						case RIL_REQUEST_PTT_QUERY_BLOCKED_INDICATOR_TYPE.IMSI_IMEI_EXCEPTION:
+							statusStr += "IMSI_IMEI_EXCEPTION";
+							break;
+						}
+						i = new Intent(Constants.STATUS_CHANGED_ACTION);
+						i.putExtra(Constants.EXTRA_UE_STATUS, statusStr);
+						sendBroadcast(i);
+						Log.d(TAG, "RIL_REQUEST_PTT_QUERY_BLOCKED_INDICATOR: "+statusStr);
+						break;
+					case Constants.RIL_UNSOL_PTT_NETWORK_VERSION:
+						dataInfo = (int[])obj;
+						statusStr = "NETWORK_VERIONS: "+dataInfo[0];
+						i = new Intent(Constants.STATUS_CHANGED_ACTION);
+						i.putExtra(Constants.EXTRA_UE_STATUS, statusStr);
+						sendBroadcast(i);
+						break;
 				}
 				
 			}
@@ -565,6 +648,40 @@ public class IntercomApplication extends Application {
 		this.joinedGroupObj.setJoinedSuccess(true);
 	}
 	
+	public String getTun() {
+		return tun;
+	}
+
+	public void setTun(String tun) {
+		this.tun = tun;
+	}
+
+	public int getGroupCallPriority() {
+		return groupCallPriority;
+	}
+
+	public void setGroupCallPriority(int groupCallPriority) {
+		if( groupCallPriority< CALL_PRIORITY_TYPE.PRIORITY_0.ordinal() ||
+				groupCallPriority > CALL_PRIORITY_TYPE.PRIORITY_15.ordinal()){
+			groupCallPriority = CALL_PRIORITY_TYPE.PRIORITY_15.ordinal();
+		}else{
+			this.groupCallPriority = groupCallPriority;
+		}
+	}
+
+	public int getJoinGroupPriority() {
+		return joinGroupPriority;
+	}
+
+	public void setJoinGroupPriority(int joinGroupPriority) {
+		if( joinGroupPriority< CALL_PRIORITY_TYPE.PRIORITY_0.ordinal() ||
+				joinGroupPriority > CALL_PRIORITY_TYPE.PRIORITY_15.ordinal()){
+			joinGroupPriority = CALL_PRIORITY_TYPE.PRIORITY_15.ordinal();
+		}else{
+			this.joinGroupPriority = joinGroupPriority;
+		}
+	}
+
 	public void releaseGroup(int joinedGroupObjId){
 		for( int index=0;index<groupObjList.size();index++){
 			if( groupObjList.get(index).getGroupId() == joinedGroupObjId){
@@ -602,11 +719,7 @@ public class IntercomApplication extends Application {
 	}
 	
 	public void requestJoinInGroup(GroupObject groupObj){
-			if( null != joinedGroupObj && groupObj.getGroupId() == joinedGroupObj.getGroupId()
-					&& true ==joinedGroupObj.isJoinedSuccess()){
-				return;
-			}
-			int[] groupInfo = new int[]{groupObj.getGroupId(), 5,0};
+			int[] groupInfo = new int[]{groupObj.getGroupId(), joinGroupPriority,0};
 			intercom.joinInGroup(
 					groupInfo,
 					mHandler.obtainMessage(
@@ -614,4 +727,15 @@ public class IntercomApplication extends Application {
 			joinedGroupObj = groupObj;
 			joinedGroupObj.setJoinedSuccess(false);
 	}
+	
+	public void queryDeviceInfo(){
+		intercom.deviceInfo(mHandler.obtainMessage(
+				Constants.RIL_REQUEST_PTT_DEVICE_INFO));
+	}
+	
+	public void queryBlocked(){
+		intercom.deviceInfo(mHandler.obtainMessage(
+				Constants.RIL_REQUEST_PTT_QUERY_BLOCKED_INDICATOR));		
+	}
+	
 }

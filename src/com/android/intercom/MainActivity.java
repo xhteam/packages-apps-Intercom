@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
+import android.text.InputType;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -32,7 +33,6 @@ import android.widget.Toast;
 
 import com.android.internal.telephony.Phone;
 import com.android.internal.telephony.PhoneFactory;
-
 import com.android.intercom.R;
 import com.android.intercom.adapter.FunctionAdapter;
 import com.android.intercom.object.GroupObject;
@@ -41,8 +41,9 @@ import com.android.intercom.utils.Constants.AI_SERVICE_TYPE;
 
 public class MainActivity extends Activity implements OnClickListener {
 	private static final String TAG = "MainActivity";
-	private TextView statusTxtView;
-	private Button clearBtn;
+	private TextView statusTxtView,tunTxtView;
+	private Button clearBtn, deviceInfoBtn, blockedIndicatorBtn,
+			setGroupCallPriorityBtn, setJoinGroupPriorityBtn;
 	private Button checkPttBussiness;
 	private Phone intercom;
 	private StatusChangedReceiver statusChangedReceiver;
@@ -65,16 +66,28 @@ public class MainActivity extends Activity implements OnClickListener {
 		intercom = intercomApp.getIntercom();
 		Log.v(TAG, "get defaultPhone.");
 		statusChangedReceiver = new StatusChangedReceiver();
-		registerReceiver(statusChangedReceiver, new IntentFilter(
-				Constants.STATUS_CHANGED_ACTION));
+		IntentFilter intentFilter = new IntentFilter();
+		intentFilter.addAction(Constants.STATUS_CHANGED_ACTION);
+		intentFilter.addAction(Constants.ASK_TO_JOIN_GROUP_ACTION);		
+		registerReceiver(statusChangedReceiver, intentFilter);
 	}
 
 	private void initView() {
 		statusTxtView = (TextView) findViewById(R.id.statusTxtView);
+		tunTxtView = (TextView)findViewById(R.id.tunTxtView);
 		clearBtn = (Button)findViewById(R.id.clearBtn);
 		checkPttBussiness = (Button)findViewById(R.id.checkPttBussiness);
+		deviceInfoBtn= (Button)findViewById(R.id.deviceInfoBtn);
+		blockedIndicatorBtn= (Button)findViewById(R.id.blockedIndicatorBtn);
+		setGroupCallPriorityBtn = (Button)findViewById(R.id.setGroupCallPriorityBtn);
+		setJoinGroupPriorityBtn = (Button)findViewById(R.id.setJoinGroupPriorityBtn);
 		clearBtn.setOnClickListener(this);
 		checkPttBussiness.setOnClickListener(this);
+		deviceInfoBtn.setOnClickListener(this);
+		blockedIndicatorBtn.setOnClickListener(this);
+		setGroupCallPriorityBtn.setOnClickListener(this);
+		setJoinGroupPriorityBtn.setOnClickListener(this);
+		tunTxtView.setText(intercomApp.getTun());
 	}
 
 	@Override
@@ -99,6 +112,18 @@ public class MainActivity extends Activity implements OnClickListener {
 			break;
 		case R.id.checkPttBussiness:
 			intercomApp.requestPttQueryBizState();
+			break;
+		case R.id.deviceInfoBtn:
+			intercomApp.queryDeviceInfo();
+			break;
+		case R.id.blockedIndicatorBtn:
+			intercomApp.queryBlocked();
+			break;
+		case R.id.setGroupCallPriorityBtn:
+			this.chooseGroupCallPriorityView();
+			break;
+		case R.id.setJoinGroupPriorityBtn:
+			this.chooseJoinGroupPriorityView();
 			break;
 		}
 	}
@@ -200,17 +225,128 @@ public class MainActivity extends Activity implements OnClickListener {
 		});
 	}
 
+	private void setupChooseJoinGroup(int groupId) {
+		GroupObject tempObj = null;
+		for( int index=0;index<intercomApp.getGroupObjList().size();index++){
+			if( groupId == intercomApp.getGroupObjList().get(index).getGroupId()){
+				tempObj = intercomApp.getGroupObjList().get(index);
+				break;
+			}
+		}
+		if( null == tempObj ){
+			Toast.makeText(this, "can not find group with id: "+groupId, Toast.LENGTH_LONG).show();
+			return;
+		}
+		
+		final GroupObject groupObj = tempObj;
+		AlertDialog.Builder alertDialogBuilding = new AlertDialog.Builder(this);
+		final View v = LayoutInflater.from(this).inflate(
+				R.layout.join_group_view, null);
+		final TextView phoneEditText = (TextView) v
+				.findViewById(R.id.groupInfoTextView);
+		Button okButton = (Button) v.findViewById(R.id.okBtn);
+		Button cancelButton = (Button) v.findViewById(R.id.cancelBtn);
+		phoneEditText.setText("please join in group,GroupName: "
+				+ groupObj.getGroupName() + " GroupId: "
+				+ groupObj.getGroupId());
+		
+		alertDialogBuilding.setView(v);
+		final AlertDialog alertDialog = alertDialogBuilding.show();
+		okButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				// TODO Auto-generated method stub
+				intercomApp.requestJoinInGroup(groupObj);
+				alertDialog.dismiss();
+			}			
+		});
+		cancelButton.setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View arg0) {
+				// TODO Auto-generated method stub
+				alertDialog.dismiss();
+			}			
+		});		
+	}
+	
+	private void chooseGroupCallPriorityView() {
+		AlertDialog.Builder alertDialogBuilding = new AlertDialog.Builder(this);
+		final View v = LayoutInflater.from(this).inflate(
+				R.layout.call_number_view, null);
+		final EditText phoneEditText = (EditText) v
+				.findViewById(R.id.phoneNumEditText);
+		phoneEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
+		Button okButton = (Button) v.findViewById(R.id.okBtn);
+		Button cancelButton = (Button) v.findViewById(R.id.cancelBtn);
+
+		alertDialogBuilding.setView(v);
+		final AlertDialog alertDialog = alertDialogBuilding.show();
+		alertDialog.setCanceledOnTouchOutside(false);
+
+		okButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				intercomApp.setGroupCallPriority(Integer.parseInt(phoneEditText.getText().toString()) );
+				alertDialog.dismiss();
+			}
+		});
+		cancelButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				alertDialog.dismiss();
+			}
+		});
+	}
+	
+	private void chooseJoinGroupPriorityView() {
+		AlertDialog.Builder alertDialogBuilding = new AlertDialog.Builder(this);
+		final View v = LayoutInflater.from(this).inflate(
+				R.layout.call_number_view, null);
+		final EditText phoneEditText = (EditText) v
+				.findViewById(R.id.phoneNumEditText);
+		phoneEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
+		Button okButton = (Button) v.findViewById(R.id.okBtn);
+		Button cancelButton = (Button) v.findViewById(R.id.cancelBtn);
+
+		alertDialogBuilding.setView(v);
+		final AlertDialog alertDialog = alertDialogBuilding.show();
+		alertDialog.setCanceledOnTouchOutside(false);
+
+		okButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				intercomApp.setJoinGroupPriority(Integer.parseInt(phoneEditText.getText().toString()) );
+				alertDialog.dismiss();
+			}
+		});
+		cancelButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				alertDialog.dismiss();
+			}
+		});
+	}
+	
 	class StatusChangedReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			// TODO Auto-generated method stub
-			if (intent.getAction().equals(Constants.STATUS_CHANGED_ACTION)) {
+			String action = intent.getAction();
+			if (action.equals(Constants.STATUS_CHANGED_ACTION)) {
 				stautsText = "\n\n"
 						+ intent.getExtras().getString(
 								Constants.EXTRA_UE_STATUS);
 				String oldTextStr = statusTxtView.getText().toString();
 				statusTxtView.setText(oldTextStr + stautsText);
+			}else if( action.equals(Constants.ASK_TO_JOIN_GROUP_ACTION)){
+				int groupId = intent.getExtras().getInt(Constants.EXTRA_GROUPIOD);
+				setupChooseJoinGroup(groupId);
+			}else if( action.equals(Constants.TUN_UPDATED_ACTION)){
+				tunTxtView.setText(intercomApp.getTun());
 			}
+			
 		}
 	}
 }

@@ -15,12 +15,18 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:text="@+string/mainlayoutTxt" />
-
+	<TextView
+        android:id="@+id/tunTxtView"
+        style="@style/CommonText_black_l_size"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+		android:layout_below="@+id/titleTxtView" />
+	
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/operateLayout"
-        android:layout_below="@+id/titleTxtView"
+        android:layout_below="@+id/tunTxtView"
         android:fadingEdge="vertical"
         android:fillViewport="true"
         android:scrollbars="vertical" >
@@ -43,8 +49,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:orientation="vertical" >
+	<LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="horizontal" >
-
         <Button
             android:id="@+id/clearBtn"
             android:layout_width="wrap_content"
@@ -57,8 +66,42 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/clearTxt" >
+            android:text="@string/pttBussissTxt" >
         </Button>
+        <Button
+            android:id="@+id/deviceInfoBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/deviceInfoTxt" >
+        </Button>
+        </LinearLayout>
+        <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+        <Button
+            android:id="@+id/blockedIndicatorBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/blockedIndicatorTxt" >
+        </Button>
+        <Button
+            android:id="@+id/setGroupCallPriorityBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/setGroupCallPriorityTxt" >
+        </Button>
+        <Button
+            android:id="@+id/setJoinGroupPriorityBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/setJoinGroupPriorityTxt" >
+        </Button>
+        </LinearLayout>
     </LinearLayout>
 
 </RelativeLayout>

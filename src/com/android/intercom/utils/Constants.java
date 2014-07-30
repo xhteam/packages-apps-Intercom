@@ -44,6 +44,8 @@ public class Constants {
 	public static final String JOINED_GROUP_CHANGED_ACTION="joined_group_changed";
 	public static final String STATUS_CHANGED_ACTION = "com.android.intercom.uestatusChanged";
 	public static final String GROUP_LIST_CHANGED_ACTION = "com.android.intercom.groupListChanged";
+	public static final String ASK_TO_JOIN_GROUP_ACTION = "com.android.intercom.askJoinGroup";
+	public static final String TUN_UPDATED_ACTION = "com.android.intercom.tunUpdated";
 	
 	public Constants() {
 		// TODO Auto-generated constructor stub

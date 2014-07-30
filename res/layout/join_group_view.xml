@@ -1,16 +1,15 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
-<EditText 
-    android:id="@+id/phoneNumEditText"
+<TextView 
+    android:id="@+id/groupInfoTextView"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:inputType="phone" />
+    android:layout_height="wrap_content"/>
  <LinearLayout
         android:id="@+id/operate_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/phoneNumEditText"
+        android:layout_below="@+id/groupInfoTextView"
         android:orientation="horizontal" >
 
         <Button

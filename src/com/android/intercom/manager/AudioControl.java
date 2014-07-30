@@ -28,7 +28,7 @@ public class AudioControl {
 		audioManager.setSpeakerphoneOn(mute);
 	}
 	
-	public void setInCommunication(){
+	public void setAsSpeaker(){
 		audioManager.setMode(AudioManager.MODE_IN_CALL);
 		audioManager.adjustStreamVolume(AudioManager.STREAM_VOICE_CALL, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI);
 		audioManager.setStreamMute(AudioManager.STREAM_VOICE_CALL,false);

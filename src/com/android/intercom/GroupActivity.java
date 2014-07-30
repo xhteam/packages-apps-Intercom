@@ -43,7 +43,9 @@ public class GroupActivity extends Activity implements OnClickListener,
 	private Phone intercom;
 	private IntercomApplication intercomApp;
 	private GroupListReceiver groupListReceiver;
-
+	private boolean isLongPressKey = false;
+	private boolean lockLongPressKey = false;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -170,6 +172,21 @@ public class GroupActivity extends Activity implements OnClickListener,
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		// TODO Auto-generated method stub
 		//intercomApp.onKeyDown(keyCode, event);
+		Log.d(TAG, "IN GroupActivity, onKeyDown,KEYCODE: " + keyCode);
+		if (keyCode == KeyEvent.KEYCODE_F12) {
+			if (event.getRepeatCount() == 0) {// 识别长按短按的代码
+				event.startTracking();
+				isLongPressKey = false;
+			} else {
+				if (isLongPressKey != true) {
+					Log.d(TAG, "Long Click.");
+					isLongPressKey = true;
+					// intercomApp.onKeyDown(keyCode, event);
+				}
+			}
+			Log.d(TAG, "event.getRepeatCount(): " + event.getRepeatCount());
+			return true;
+		}
 		return super.onKeyDown(keyCode, event);
 	}
 	
@@ -177,7 +194,25 @@ public class GroupActivity extends Activity implements OnClickListener,
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
 		// TODO Auto-generated method stub
 		//intercomApp.onKeyUp(keyCode, event);
+		Log.d(TAG, "IN GroupActivity, onKeyUp,KEYCODE: " + keyCode);
+		if (keyCode == KeyEvent.KEYCODE_F12) {
+			lockLongPressKey = false;
+			intercomApp.keyUp(keyCode, event);
+			return true;
+		}
+		
 		return super.onKeyUp(keyCode, event);
+	}
+	
+	@Override
+	public boolean onKeyLongPress(int keyCode, KeyEvent event) {
+		Log.v(TAG, "key long pressed keyCode = " + keyCode);
+		if (keyCode == KeyEvent.KEYCODE_F12) {
+			lockLongPressKey = true;
+			intercomApp.keyDown(keyCode, event);
+			return true;
+		}
+		return super.onKeyLongPress(keyCode, event);
 	}
 	
 	class GroupListReceiver extends BroadcastReceiver{
