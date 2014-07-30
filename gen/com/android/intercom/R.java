@@ -48,34 +48,32 @@ public final class R {
         public static final int item_normal_border=0x7f020001;
     }
     public static final class id {
-        public static final int audioBroadCast=0x7f0a001b;
-        public static final int audioGroupCall=0x7f0a001a;
-        public static final int audioPointCall=0x7f0a001c;
-        public static final int autoJoinGroupBtn=0x7f0a0016;
-        public static final int buttonTitleTextView=0x7f0a0008;
-        public static final int cancelBtn=0x7f0a000c;
-        public static final int clearBtn=0x7f0a0004;
-        public static final int closeScanListBtn=0x7f0a0010;
-        public static final int exitBtn=0x7f0a0001;
-        public static final int exitGroupBtn=0x7f0a0017;
-        public static final int functionsListView=0x7f0a0007;
-        public static final int functionsTitleTxtView=0x7f0a0006;
-        public static final int groupIdTxtView=0x7f0a000d;
-        public static final int groupListView=0x7f0a0012;
-        public static final int groupNameTxtView=0x7f0a000e;
-        public static final int joinGroupBtn=0x7f0a0015;
-        public static final int okBtn=0x7f0a000b;
-        public static final int openScanListBtn=0x7f0a0011;
-        public static final int operate_layout=0x7f0a000a;
-        public static final int operate_layout_01=0x7f0a0014;
-        public static final int operate_layout_02=0x7f0a0018;
-        public static final int operate_title=0x7f0a0013;
-        public static final int phoneNumEditText=0x7f0a0009;
-        public static final int scannGroupLayout=0x7f0a000f;
-        public static final int setAsCurrentGroupBtn=0x7f0a0019;
-        public static final int statusTxtView=0x7f0a0003;
-        public static final int tab1=0x7f0a0002;
-        public static final int tab2=0x7f0a0005;
+        public static final int audioBroadCast=0x7f0a0019;
+        public static final int audioGroupCall=0x7f0a0018;
+        public static final int audioPointCall=0x7f0a001a;
+        public static final int autoJoinGroupBtn=0x7f0a0014;
+        public static final int buttonTitleTextView=0x7f0a0005;
+        public static final int cancelBtn=0x7f0a0009;
+        public static final int checkPttBussiness=0x7f0a0004;
+        public static final int clearBtn=0x7f0a0003;
+        public static final int closeScanListBtn=0x7f0a000e;
+        public static final int exitGroupBtn=0x7f0a0015;
+        public static final int functionsTitleTxtView=0x7f0a000c;
+        public static final int groupIdTxtView=0x7f0a000a;
+        public static final int groupListView=0x7f0a0010;
+        public static final int groupNameTxtView=0x7f0a000b;
+        public static final int joinGroupBtn=0x7f0a0013;
+        public static final int okBtn=0x7f0a0008;
+        public static final int openScanListBtn=0x7f0a000f;
+        public static final int operateLayout=0x7f0a0001;
+        public static final int operate_layout=0x7f0a0007;
+        public static final int operate_layout_01=0x7f0a0012;
+        public static final int operate_layout_02=0x7f0a0016;
+        public static final int operate_title=0x7f0a0011;
+        public static final int phoneNumEditText=0x7f0a0006;
+        public static final int scannGroupLayout=0x7f0a000d;
+        public static final int setAsCurrentGroupBtn=0x7f0a0017;
+        public static final int statusTxtView=0x7f0a0002;
         public static final int titleTxtView=0x7f0a0000;
     }
     public static final class layout {
@@ -92,25 +90,28 @@ public final class R {
     public static final class string {
         public static final int action_settings=0x7f070001;
         public static final int app_name=0x7f070000;
-        public static final int audio_broadcast=0x7f07000d;
-        public static final int audio_group_call=0x7f07000c;
-        public static final int audio_point_call=0x7f07000e;
-        public static final int autojoinGroupTxt=0x7f070008;
-        public static final int cancelBtnTxt=0x7f070010;
-        public static final int cancelTxt=0x7f07000a;
-        public static final int clearTxt=0x7f070014;
-        public static final int exitGroupTxt=0x7f070009;
+        public static final int audio_broadcast=0x7f07000e;
+        public static final int audio_group_call=0x7f07000d;
+        public static final int audio_point_call=0x7f07000f;
+        public static final int autojoinGroupTxt=0x7f070009;
+        public static final int cancelBtnTxt=0x7f070011;
+        public static final int cancelTxt=0x7f07000b;
+        public static final int clearTxt=0x7f070015;
+        public static final int closeScanListTxt=0x7f070016;
+        public static final int exitGroupTxt=0x7f07000a;
         public static final int exit_btn=0x7f070003;
-        public static final int functionsTitle=0x7f070004;
-        public static final int groupListTitle=0x7f070005;
+        public static final int functionsTitle=0x7f070005;
+        public static final int get_list=0x7f070004;
+        public static final int groupListTitle=0x7f070006;
         public static final int hello_world=0x7f070002;
-        public static final int joinGroupTxt=0x7f070007;
-        public static final int joinOrexistGroupTitle=0x7f070006;
-        public static final int mainlayoutTxt=0x7f070011;
-        public static final int okBtnTxt=0x7f07000f;
-        public static final int operateTxt=0x7f070013;
-        public static final int setAsCurrentGroupTxt=0x7f07000b;
-        public static final int statusTitleTxt=0x7f070012;
+        public static final int joinGroupTxt=0x7f070008;
+        public static final int joinOrexistGroupTitle=0x7f070007;
+        public static final int mainlayoutTxt=0x7f070012;
+        public static final int okBtnTxt=0x7f070010;
+        public static final int openScanListTxt=0x7f070017;
+        public static final int operateTxt=0x7f070014;
+        public static final int setAsCurrentGroupTxt=0x7f07000c;
+        public static final int statusTitleTxt=0x7f070013;
     }
     public static final class style {
         /** 

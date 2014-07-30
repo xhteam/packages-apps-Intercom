@@ -13,83 +13,52 @@
         style="@style/CommonText_black_l_size"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
         android:text="@+string/mainlayoutTxt" />
 
-    <TabHost
-        android:id="@android:id/tabhost"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/exitBtn"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/titleTxtView" >
+        android:layout_height="match_parent"
+        android:layout_above="@+id/operateLayout"
+        android:layout_below="@+id/titleTxtView"
+        android:fadingEdge="vertical"
+        android:fillViewport="true"
+        android:scrollbars="vertical" >
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical" >
 
-            <TabWidget
-                android:id="@android:id/tabs"
+            <TextView
+                android:id="@+id/statusTxtView"
+                style="@style/CommonText_black_normal"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
-            </TabWidget>
-
-            <FrameLayout
-                android:id="@android:id/tabcontent"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" >
-
-                <RelativeLayout
-                    android:id="@+id/tab1"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" >
-					
-                    <EditText
-                        android:id="@+id/statusTxtView"
-                        style="@style/CommonText_black_normal"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent" 
-                        android:layout_above="@+id/clearBtn"/>
-                    <Button 
-                        android:id="@+id/clearBtn"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/clearTxt"
-                        android:layout_alignParentBottom="true"
-                        />
-                </RelativeLayout>
-
-                <LinearLayout
-                    android:id="@+id/tab2"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical" >
-
-                    <TextView
-                        android:id="@+id/functionsTitleTxtView"
-                        style="@style/CommonText_black_l_size"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/functionsTitle" />
-
-                    <ListView
-                        android:id="@+id/functionsListView"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="30dp"
-                        android:dividerHeight="10dp" >
-                    </ListView>
-                </LinearLayout>
-            </FrameLayout>
+                android:layout_height="match_parent" />
         </LinearLayout>
-    </TabHost>
+    </ScrollView>
 
-    <Button
-        android:id="@+id/exitBtn"
+    <LinearLayout
+        android:id="@+id/operateLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:text="@string/exit_btn" >
-    </Button>
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/clearBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/clearTxt" />
+
+        <Button
+            android:id="@+id/checkPttBussiness"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/clearTxt" >
+        </Button>
+    </LinearLayout>
 
 </RelativeLayout>

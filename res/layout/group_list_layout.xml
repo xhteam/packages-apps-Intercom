@@ -8,23 +8,33 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity" >
 
+    <TextView
+        android:id="@+id/functionsTitleTxtView"
+        style="@style/CommonText_black_l_size"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/groupListTitle" />
+
     <LinearLayout
         android:id="@+id/scannGroupLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/functionsTitleTxtView"
         android:orientation="horizontal" >
 
         <Button
             android:id="@+id/closeScanListBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:text="@string/closeScanListTxt" />
 
         <Button
             android:id="@+id/openScanListBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:text="@string/openScanListTxt" />
     </LinearLayout>
 
     <LinearLayout
@@ -32,13 +42,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/scannGroupLayout"
         android:orientation="vertical" >
-
-        <TextView
-            android:id="@+id/functionsTitleTxtView"
-            style="@style/CommonText_black_l_size"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/groupListTitle" />
 
         <ListView
             android:id="@+id/groupListView"
@@ -48,13 +51,5 @@
             android:dividerHeight="10dp" >
         </ListView>
     </LinearLayout>
-
-    <Button
-        android:id="@+id/exitBtn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:text="@string/exit_btn" >
-    </Button>
 
 </RelativeLayout>

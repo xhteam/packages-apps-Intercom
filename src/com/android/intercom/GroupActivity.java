@@ -37,12 +37,10 @@ public class GroupActivity extends Activity implements OnClickListener,
 	private final String TAG = "GroupActivity";
 	
 	private ListView groupListView;
-	private Button exitButton;
 	private Button closeScanListBtn;
 	private Button openScanListBtn;
 	private GroupAdapter groupAdapter;
 	private Phone intercom;
-	private Handler mHandler;
 	private IntercomApplication intercomApp;
 	private GroupListReceiver groupListReceiver;
 
@@ -51,7 +49,6 @@ public class GroupActivity extends Activity implements OnClickListener,
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		this.setContentView(R.layout.group_list_layout);
-		initHandler();
 		initData();
 		initView();
 	}
@@ -60,29 +57,28 @@ public class GroupActivity extends Activity implements OnClickListener,
 		intercomApp = (IntercomApplication)this.getApplication();
 		intercom = intercomApp.getIntercom();
 		groupListReceiver = new GroupListReceiver();
-		registerReceiver(groupListReceiver, new IntentFilter(Constants.GROUP_LIST_CHANGED_ACTION));
+		IntentFilter intentFilter = new IntentFilter();
+		intentFilter.addAction(Constants.GROUP_LIST_CHANGED_ACTION);
+		intentFilter.addAction(Constants.JOINED_GROUP_CHANGED_ACTION);
+		registerReceiver(groupListReceiver, intentFilter);
 	}
 
 	private void initView() {
 		groupListView = (ListView) findViewById(R.id.groupListView);
-		exitButton = (Button) findViewById(R.id.exitBtn);
 		closeScanListBtn = (Button)findViewById(R.id.closeScanListBtn);
 		openScanListBtn = (Button)findViewById(R.id.openScanListBtn);
 		
-		exitButton.setOnClickListener(this);
 		closeScanListBtn.setOnClickListener(this);
 		openScanListBtn.setOnClickListener(this);
-		List<GroupObject> groupObjList = new ArrayList<GroupObject>();
-		for (int index = 0; index < 5; index++) {
-			GroupObject obj = new GroupObject(index, "" + (index + 1));
-			groupObjList.add(obj);
-		}
-		groupAdapter = new GroupAdapter(this, groupObjList,intercomApp.getActiveGroupObjList());
+		
+		groupAdapter = new GroupAdapter(this, intercomApp.getGroupObjList(),intercomApp.getActiveGroupObjList());
 		groupListView.setAdapter(groupAdapter);
-
+		groupAdapter.setIntercomApp(intercomApp);
 		groupListView.setOnItemClickListener(this);
-	}
 
+		intercomApp.startQueryGroups();	
+	}
+	
 	@Override
 	protected void onDestroy() {
 		// TODO Auto-generated method stub
@@ -94,79 +90,13 @@ public class GroupActivity extends Activity implements OnClickListener,
 	public void onClick(View v) {
 		// TODO Auto-generated method stub
 		switch (v.getId()) {
-		case R.id.exitBtn:
-			finish();
-			break;
 		case R.id.openScanListBtn:
-			String groupIdList = "";
-			List<GroupObject > groupList = intercomApp.getGroupObjList();
-			for( int index=0;index<groupList.size()-1;index++){
-				groupIdList += groupList.get(index).getGroupId()+" ";
-			}
-			groupIdList += ""+groupList.get(groupList.size()-1).getGroupId();
-			//TODO::
-			//intercom.currentGroupScanListUpdate();
+			intercomApp.openGroupListScan();
 			break;
 		case R.id.closeScanListBtn:
+			intercomApp.closeGroupListScan();
 			break;
 		}
-	}
-
-	private void initHandler() {
-		mHandler = new Handler() {
-			public void handleMessage(Message msg) {
-				Object obj = msg.obj;
-				Log.v("johnny",
-						"====================get message from ril.obj: "
-								+ obj.toString());
-				String statusStr = "";
-				int[] dataInfo = new int[10];
-				Intent i ;
-				switch(msg.what){
-				//handle request join group.
-				case Constants.RIL_REQUEST_PTT_GROUP_SETUP:
-					dataInfo = (int[])obj;
-					switch(dataInfo[0]){
-					case Constants.RIL_REQUEST_PTT_GROUP_SETUP_RESULT_TYPE.NO_NETWORK:
-						statusStr = "ue has NO_NETWORK";
-						break;
-					case Constants.RIL_REQUEST_PTT_GROUP_SETUP_RESULT_TYPE.NOT_SIGN_GROUP:
-						statusStr = "ue NOT_SIGN_GROUP";
-						break;
-					case Constants.RIL_REQUEST_PTT_GROUP_SETUP_RESULT_TYPE.UE_NOT_SUPORT:
-						statusStr = "UE_NOT_SUPORT";
-						break;
-					case Constants.RIL_REQUEST_PTT_GROUP_SETUP_RESULT_TYPE.UE_REMOTE_CLOSED_FOR_TEMP:
-						statusStr = "UE_REMOTE_CLOSED_FOR_TEMP";
-						break;
-					case Constants.RIL_REQUEST_PTT_GROUP_SETUP_RESULT_TYPE.UE_REMOTE_CLOSED_FOREVER:
-						statusStr = "UE_REMOTE_CLOSED_FOREVER";
-						break;
-					default:
-						statusStr = "UE join group: "+ dataInfo[1]+"successfully.";
-						break;
-					}
-					break;
-				case Constants.RIL_REQUEST_PTT_GROUP_RELEASE:
-					dataInfo = (int[]) obj;
-					switch(dataInfo[0]){
-					case Constants.RIL_REQUEST_PTT_GROUP_RELEASE_RESULT_TYPE.UE_CLOSE_GROUP_SUCCESS:
-						statusStr = "close group successfully " + "groupId: "+ dataInfo[1]+ " ";
-						break;
-					case Constants.RIL_REQUEST_PTT_GROUP_RELEASE_RESULT_TYPE.UE_HAS_NO_RIGHT_CLOSED_GROUP:
-						statusStr = "close group fail for UE_CLOSE_GROUP_SUCCESS";
-						break;
-					default:
-						statusStr = "close group fail for other error";
-						break;
-					}
-				}
-
-				i = new Intent(Constants.STATUS_CHANGED_ACTION);
-				i.putExtra(Constants.EXTRA_UE_STATUS, statusStr);
-				sendBroadcast(i);
-			}
-		};
 	}
 
 	@Override
@@ -194,8 +124,7 @@ public class GroupActivity extends Activity implements OnClickListener,
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				int[] groupInfo = new int[]{groupObj.getGroupId(), 5,0};
-				intercom.joinInGroup(groupInfo, mHandler.obtainMessage(Constants.RIL_REQUEST_PTT_GROUP_SETUP));
+				intercomApp.requestJoinInGroup(groupObj);
 				alertDialog.dismiss();
 			}
 		});
@@ -204,7 +133,7 @@ public class GroupActivity extends Activity implements OnClickListener,
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				int[] groupInfo = new int[]{groupObj.getGroupId(), 5,1};
-				intercom.joinInGroup(groupInfo, mHandler.obtainMessage(Constants.RIL_REQUEST_PTT_GROUP_SETUP));
+				intercom.joinInGroup(groupInfo, intercomApp.getmHandler().obtainMessage(Constants.RIL_REQUEST_PTT_GROUP_SETUP));
 				alertDialog.dismiss();
 			}
 		});
@@ -212,8 +141,8 @@ public class GroupActivity extends Activity implements OnClickListener,
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				int[] groupInfo = new int[]{groupObj.getGroupId(), 0,0};
-				intercom.exitGroup(groupInfo,mHandler.obtainMessage(Constants.RIL_REQUEST_PTT_GROUP_RELEASE));
+				int[] groupInfo = new int[]{0,groupObj.getGroupId()};
+				intercom.exitGroup(groupInfo,intercomApp.getmHandler().obtainMessage(Constants.RIL_REQUEST_PTT_GROUP_RELEASE));
 				alertDialog.dismiss();
 			}
 		});
@@ -240,14 +169,14 @@ public class GroupActivity extends Activity implements OnClickListener,
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		// TODO Auto-generated method stub
-		intercomApp.onKeyDown(keyCode, event);
+		//intercomApp.onKeyDown(keyCode, event);
 		return super.onKeyDown(keyCode, event);
 	}
 	
 	@Override
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
 		// TODO Auto-generated method stub
-		intercomApp.onKeyUp(keyCode, event);
+		//intercomApp.onKeyUp(keyCode, event);
 		return super.onKeyUp(keyCode, event);
 	}
 	
@@ -255,10 +184,21 @@ public class GroupActivity extends Activity implements OnClickListener,
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			// TODO Auto-generated method stub
-			if( intent.getAction().equals(Constants.GROUP_LIST_CHANGED_ACTION)){
-				Log.d(TAG, "GROUP_LIST_CHANGED_ACTION");
+			String action = intent.getAction();
+			Log.d(TAG, "action: "+action);
+			if( action.equals(Constants.GROUP_LIST_CHANGED_ACTION)){
 				groupAdapter.setGroupList(intercomApp.getGroupObjList());
 				groupAdapter.setActiveGroupList(intercomApp.getActiveGroupObjList());
+				groupAdapter.notifyDataSetChanged();
+				if( null == intercomApp.getJoinedGroupObj() && 0 != intercomApp.getGroupObjList().size()){
+					int[] groupInfo = new int[]{intercomApp.getGroupObjList().get(0).getGroupId(), 5,0};
+					intercom.joinInGroup(
+							groupInfo,
+							intercomApp.getmHandler().obtainMessage(
+									Constants.RIL_REQUEST_PTT_GROUP_SETUP));
+				}				
+			}else if(action.equals(Constants.JOINED_GROUP_CHANGED_ACTION)){
+				groupAdapter.notifyDataSetChanged();
 			}
 		}		
 	}

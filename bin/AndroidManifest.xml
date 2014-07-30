@@ -8,6 +8,7 @@
 
 	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 	<uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
+	<uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
     <original-package android:name="com.android.intercom" />
     <uses-sdk
         android:minSdkVersion="8"

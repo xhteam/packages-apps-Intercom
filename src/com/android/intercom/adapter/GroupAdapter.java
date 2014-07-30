@@ -3,8 +3,9 @@ package com.android.intercom.adapter;
 import java.util.List;
 
 import com.android.intercom.object.GroupObject;
-
+import com.android.intercom.IntercomApplication;
 import com.android.intercom.R;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,7 @@ public class GroupAdapter extends BaseAdapter {
 	private Context mContext;
 	private List<GroupObject> groupList;
 	private List<GroupObject> activeGroupList;
+	private IntercomApplication intercomApp;
 		
 	public GroupAdapter(Context context, List<GroupObject> groupList,List<GroupObject> activeGroupList) {
 		// TODO Auto-generated constructor stub
@@ -55,14 +57,28 @@ public class GroupAdapter extends BaseAdapter {
 		}
 		
 		TextView groupIdTxtView = (TextView)v.findViewById(R.id.groupIdTxtView);
+		TextView groupNameTxtView = (TextView)v.findViewById(R.id.groupNameTxtView);
 		groupIdTxtView.setText(""+groupList.get(position).getGroupId());
+		groupNameTxtView.setText(""+groupList.get(position).getGroupName());
 		
 		v.setBackgroundColor(R.color.white);
 		
-		for(int index=0;index< activeGroupList.size();index++){
-			if( activeGroupList.get(position).getGroupId() == groupList.get(position).getGroupId()){
+		/*for(int index=0;index< activeGroupList.size();index++){
+			if( activeGroupList.get(index).getGroupId() == groupList.get(position).getGroupId()){
 				v.setBackgroundColor(R.color.red);
 				break;
+			}
+		}*/
+		
+		//mark the joined group.
+		if (null != intercomApp.getJoinedGroupObj()) {
+			if (intercomApp.getJoinedGroupObj().getGroupId() == groupList.get(
+					position).getGroupId()) {
+				groupIdTxtView.setTextColor(mContext.getResources().getColor(R.color.blue));
+				groupNameTxtView.setTextColor(mContext.getResources().getColor(R.color.blue));
+			}else{
+				groupIdTxtView.setTextColor(mContext.getResources().getColor(R.color.black));
+				groupNameTxtView.setTextColor(mContext.getResources().getColor(R.color.black));				
 			}
 		}
 		
@@ -85,4 +101,11 @@ public class GroupAdapter extends BaseAdapter {
 		this.activeGroupList = activeGroupList;
 	}
 
+	public IntercomApplication getIntercomApp() {
+		return intercomApp;
+	}
+
+	public void setIntercomApp(IntercomApplication intercomApp) {
+		this.intercomApp = intercomApp;
+	}
 }

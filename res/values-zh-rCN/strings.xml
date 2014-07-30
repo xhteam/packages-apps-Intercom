@@ -21,4 +21,8 @@
     <string name="statusTitleTxt">通话状态</string>
     <string name="operateTxt">通话操作</string>
     <string name="clearTxt">清除</string>
+    
+    <string name="closeScanListTxt">关闭群组扫描</string>    
+    <string name="openScanListTxt">开启群组扫描</string>
+    
 </resources>

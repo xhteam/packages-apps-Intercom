@@ -3,9 +3,11 @@ package com.android.intercom.object;
 public class GroupObject {
 
 	private int groupId;
-	int gpriority;
-	int gstate;
+	private int gpriority;
+	private int gstate;
 	private String groupName;
+	
+	private boolean isJoinedSuccess;
 	
 	public GroupObject(int groupId, String groupName) {
 		// TODO Auto-generated constructor stub
@@ -43,6 +45,14 @@ public class GroupObject {
 
 	public void setGroupName(String groupName) {
 		this.groupName = groupName;
+	}
+
+	public boolean isJoinedSuccess() {
+		return isJoinedSuccess;
+	}
+
+	public void setJoinedSuccess(boolean isJoinedSuccess) {
+		this.isJoinedSuccess = isJoinedSuccess;
 	}
 
 }

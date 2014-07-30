@@ -28,8 +28,32 @@ public class AudioControl {
 		audioManager.setSpeakerphoneOn(mute);
 	}
 	
-	
-	
-	
-	
+	public void setInCommunication(){
+		audioManager.setMode(AudioManager.MODE_IN_CALL);
+		audioManager.adjustStreamVolume(AudioManager.STREAM_VOICE_CALL, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI);
+		audioManager.setStreamMute(AudioManager.STREAM_VOICE_CALL,false);
+		OpenSpeaker();
+	}
+
+	public void OpenSpeaker() {
+		if (!audioManager.isSpeakerphoneOn()) {
+			audioManager.setSpeakerphoneOn(true);
+			audioManager
+					.setStreamVolume(
+							AudioManager.STREAM_VOICE_CALL,
+							audioManager
+									.getStreamMaxVolume(AudioManager.STREAM_VOICE_CALL),
+							AudioManager.STREAM_VOICE_CALL);
+			/*audioManager.setStreamVolume(AudioManager.STREAM_VOICE_CALL, 100,
+					AudioManager.STREAM_VOICE_CALL);*/
+		}
+	}
+
+	public void CloseSpeaker() {
+		if (audioManager != null) {
+			if (audioManager.isSpeakerphoneOn()) {
+				audioManager.setSpeakerphoneOn(false);
+			}
+		}
+	}
 }
