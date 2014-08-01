@@ -77,8 +77,8 @@ public class GroupActivity extends Activity implements OnClickListener,
 		groupListView.setAdapter(groupAdapter);
 		groupAdapter.setIntercomApp(intercomApp);
 		groupListView.setOnItemClickListener(this);
-
-		intercomApp.startQueryGroups();	
+		
+		//intercomApp.startQueryGroups();
 	}
 	
 	@Override
@@ -126,7 +126,7 @@ public class GroupActivity extends Activity implements OnClickListener,
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				intercomApp.requestJoinInGroup(groupObj);
+				intercomApp.requestManualJoinInGroup(groupObj);
 				alertDialog.dismiss();
 			}
 		});
@@ -134,8 +134,7 @@ public class GroupActivity extends Activity implements OnClickListener,
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				int[] groupInfo = new int[]{groupObj.getGroupId(), 5,1};
-				intercom.joinInGroup(groupInfo, intercomApp.getmHandler().obtainMessage(Constants.RIL_REQUEST_PTT_GROUP_SETUP));
+				intercomApp.requestAutoJoinInGroup(groupObj);
 				alertDialog.dismiss();
 			}
 		});
@@ -143,8 +142,7 @@ public class GroupActivity extends Activity implements OnClickListener,
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				int[] groupInfo = new int[]{0,groupObj.getGroupId()};
-				intercom.exitGroup(groupInfo,intercomApp.getmHandler().obtainMessage(Constants.RIL_REQUEST_PTT_GROUP_RELEASE));
+				intercomApp.requestCloseGroup(groupObj.getGroupId());
 				alertDialog.dismiss();
 			}
 		});
@@ -195,7 +193,7 @@ public class GroupActivity extends Activity implements OnClickListener,
 		// TODO Auto-generated method stub
 		//intercomApp.onKeyUp(keyCode, event);
 		Log.d(TAG, "IN GroupActivity, onKeyUp,KEYCODE: " + keyCode);
-		if (keyCode == KeyEvent.KEYCODE_F12) {
+		if((keyCode == KeyEvent.KEYCODE_F12) && true == lockLongPressKey){
 			lockLongPressKey = false;
 			intercomApp.keyUp(keyCode, event);
 			return true;
@@ -215,6 +213,19 @@ public class GroupActivity extends Activity implements OnClickListener,
 		return super.onKeyLongPress(keyCode, event);
 	}
 	
+	/*private void setOpenScanGroupView() {
+		AlertDialog.Builder alertDialogBuilding = new AlertDialog.Builder(this);
+		final View v = LayoutInflater.from(this).inflate(
+				R.layout., null);
+		Button joinGroupBtn = (Button) v.findViewById(R.id.joinGroupBtn);
+		Button autoJoinGroupBtn = (Button)v.findViewById(R.id.autoJoinGroupBtn);
+		Button exitGroupBtn = (Button) v.findViewById(R.id.exitGroupBtn);
+		Button cancelBtn = (Button) v.findViewById(R.id.cancelBtn);
+		Button setAsCurrentGroupBtn = (Button)v.findViewById(R.id.setAsCurrentGroupBtn);
+		
+		alertDialogBuilding.setView(v);
+		final AlertDialog alertDialog = alertDialogBuilding.show();
+	}*/
 	class GroupListReceiver extends BroadcastReceiver{
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -225,13 +236,6 @@ public class GroupActivity extends Activity implements OnClickListener,
 				groupAdapter.setGroupList(intercomApp.getGroupObjList());
 				groupAdapter.setActiveGroupList(intercomApp.getActiveGroupObjList());
 				groupAdapter.notifyDataSetChanged();
-				if( null == intercomApp.getJoinedGroupObj() && 0 != intercomApp.getGroupObjList().size()){
-					int[] groupInfo = new int[]{intercomApp.getGroupObjList().get(0).getGroupId(), 5,0};
-					intercom.joinInGroup(
-							groupInfo,
-							intercomApp.getmHandler().obtainMessage(
-									Constants.RIL_REQUEST_PTT_GROUP_SETUP));
-				}				
 			}else if(action.equals(Constants.JOINED_GROUP_CHANGED_ACTION)){
 				groupAdapter.notifyDataSetChanged();
 			}

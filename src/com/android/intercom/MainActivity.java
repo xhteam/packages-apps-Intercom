@@ -38,12 +38,13 @@ import com.android.intercom.adapter.FunctionAdapter;
 import com.android.intercom.object.GroupObject;
 import com.android.intercom.utils.Constants;
 import com.android.intercom.utils.Constants.AI_SERVICE_TYPE;
+import com.android.intercom.utils.Constants.EMERG_TYPE;
 
 public class MainActivity extends Activity implements OnClickListener {
 	private static final String TAG = "MainActivity";
 	private TextView statusTxtView,tunTxtView;
 	private Button clearBtn, deviceInfoBtn, blockedIndicatorBtn,
-			setGroupCallPriorityBtn, setJoinGroupPriorityBtn;
+			setGroupCallPriorityBtn, setJoinGroupPriorityBtn,closeGroupBtn;
 	private Button checkPttBussiness;
 	private Phone intercom;
 	private StatusChangedReceiver statusChangedReceiver;
@@ -81,15 +82,27 @@ public class MainActivity extends Activity implements OnClickListener {
 		blockedIndicatorBtn= (Button)findViewById(R.id.blockedIndicatorBtn);
 		setGroupCallPriorityBtn = (Button)findViewById(R.id.setGroupCallPriorityBtn);
 		setJoinGroupPriorityBtn = (Button)findViewById(R.id.setJoinGroupPriorityBtn);
+		closeGroupBtn = (Button)findViewById(R.id.closeGroupBtn);
 		clearBtn.setOnClickListener(this);
 		checkPttBussiness.setOnClickListener(this);
 		deviceInfoBtn.setOnClickListener(this);
 		blockedIndicatorBtn.setOnClickListener(this);
 		setGroupCallPriorityBtn.setOnClickListener(this);
 		setJoinGroupPriorityBtn.setOnClickListener(this);
+		closeGroupBtn.setOnClickListener(this);
 		tunTxtView.setText(intercomApp.getTun());
 	}
 
+
+	@Override
+	public void onResume() {
+		if( null == intercomApp.getTempJoinedGroupObj() ){
+			closeGroupBtn.setEnabled(false);
+		}else{
+			closeGroupBtn.setEnabled(true);
+		}
+		super.onResume();
+	}
 	@Override
 	public void onDestroy() {
 		unregisterReceiver(statusChangedReceiver);
@@ -125,6 +138,14 @@ public class MainActivity extends Activity implements OnClickListener {
 		case R.id.setJoinGroupPriorityBtn:
 			this.chooseJoinGroupPriorityView();
 			break;
+		case R.id.closeGroupBtn:
+			if( null != intercomApp.getTempJoinedGroupObj()){
+				intercomApp.requestCloseGroup(intercomApp
+						.getTempJoinedGroupObj().getGroupId());
+			}else{
+				Toast.makeText(this, "do not need to close group.", Toast.LENGTH_LONG).show();
+			}
+			break;
 		}
 	}
 
@@ -132,7 +153,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		// TODO Auto-generated method stub
 		Log.d(TAG, "IN MainActivity, onKeyDown,KEYCODE: " + keyCode);
-		if (keyCode == KeyEvent.KEYCODE_F12) {
+		if (keyCode == KeyEvent.KEYCODE_F12 || keyCode == Constants.EMERG_KEY) {
 			if (event.getRepeatCount() == 0) {// 识别长按短按的代码
 				event.startTracking();
 				isLongPressKey = false;
@@ -153,8 +174,9 @@ public class MainActivity extends Activity implements OnClickListener {
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
 		// TODO Auto-generated method stub
 		Log.d(TAG, "IN MainActivity, onKeyUp,KEYCODE: " + keyCode);
-		if (keyCode == KeyEvent.KEYCODE_F12) {
-			lockLongPressKey = false;
+		if ((keyCode == KeyEvent.KEYCODE_F12 || keyCode == Constants.EMERG_KEY)
+				&& true == lockLongPressKey) {
+	lockLongPressKey = false;
 			intercomApp.keyUp(keyCode, event);
 			return true;
 		}
@@ -164,7 +186,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	@Override
 	public boolean onKeyLongPress(int keyCode, KeyEvent event) {
 		Log.v(TAG, "key long pressed keyCode = " + keyCode);
-		if (keyCode == KeyEvent.KEYCODE_F12) {
+		if (keyCode == KeyEvent.KEYCODE_F12 || keyCode == Constants.EMERG_KEY) {
 			lockLongPressKey = true;
 			intercomApp.keyDown(keyCode, event);
 			return true;
@@ -256,7 +278,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			@Override
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
-				intercomApp.requestJoinInGroup(groupObj);
+				intercomApp.requestAutoJoinInGroup(groupObj);
 				alertDialog.dismiss();
 			}			
 		});

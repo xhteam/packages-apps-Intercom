@@ -21,8 +21,9 @@
     <string name="statusTitleTxt">通话状态</string>
     <string name="operateTxt">通话操作</string>
     <string name="clearTxt">清除</string>
-    <string name="pttBussissTxt">PTT 业务</string>
-    <string name="deviceInfoTxt">DEVICE INFO</string>    
+    <string name="pttBussissTxt">PTT业务</string>
+    <string name="deviceInfoTxt">DEVICE</string>    
+    <string name="closeGroupTxt">关闭群组</string>    
     <string name="blockedIndicatorTxt">查询摇闭</string>
     <string name="setGroupCallPriorityTxt">设置群呼优先级</string>
     <string name="setJoinGroupPriorityTxt">设置加入群组优先级</string>

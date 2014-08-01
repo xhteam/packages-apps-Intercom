@@ -71,8 +71,10 @@ public class GroupAdapter extends BaseAdapter {
 		}*/
 		
 		//mark the joined group.
-		if (null != intercomApp.getJoinedGroupObj()) {
-			if (intercomApp.getJoinedGroupObj().getGroupId() == groupList.get(
+		GroupObject activeGroup = intercomApp.getActiveGroupObj();
+		
+		if (null != activeGroup) {
+			if (activeGroup.getGroupId() == groupList.get(
 					position).getGroupId()) {
 				groupIdTxtView.setTextColor(mContext.getResources().getColor(R.color.blue));
 				groupNameTxtView.setTextColor(mContext.getResources().getColor(R.color.blue));

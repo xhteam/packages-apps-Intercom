@@ -7,6 +7,7 @@ public class Constants {
 	public static final int  RIL_REQUEST_PTT_CALL_DIAL = 0x14;
 	public static final int  RIL_REQUEST_PTT_CALL_HANGUP = 0x15;
 	public static final int  RIL_REQUEST_PTT_CURRENT_GROUP_SCANLIST_UPDATE = 0x16;
+	public static final int  RIL_REQUEST_HANGUP_WAITING_OR_BACKGROUND = 0x41;
 	//TODO::
 	//RIL_REQUEST_PTT_QUERY_BLOCKED_INDICATOR do not know the input args
 	public static final int  RIL_REQUEST_PTT_QUERY_BLOCKED_INDICATOR = 0x17;
@@ -39,6 +40,8 @@ public class Constants {
 	public static final int GRANT_SUCCESS = 0;
 	public static final int GRANT_FAIL = 1;
 	
+	public static final int EMERG_KEY = 167;
+	
 	public static final String EXTRA_UE_STATUS = "ue_status";	
 	public static final String EXTRA_GROUPIOD = "group_id";	
 	public static final String JOINED_GROUP_CHANGED_ACTION="joined_group_changed";
@@ -53,6 +56,10 @@ public class Constants {
 
 	public enum OBJECT_TYPE{
 		GROUP_OBJECT,UE_OBJECT
+	}
+	
+	public enum EMERG_TYPE{
+		POINT_CALL_EMERG_TYPE,GROUP_CALL_EMERG_TYPE,CURRENT_GROUP_EMERG_TYPE,INVALID_TYPE
 	}
 	
 	public enum CALL_PRIORITY_TYPE {
