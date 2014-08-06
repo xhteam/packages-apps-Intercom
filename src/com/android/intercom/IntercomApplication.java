@@ -135,10 +135,12 @@ public class IntercomApplication extends Application {
 					break;
 				case GROUP_CALL_EMERG_TYPE:
 					dataInfo[1] = AI_SERVICE_TYPE.AUDIO_GROUP_CALL.ordinal();
+					requestJoinInEmergGroup(callNumber);
 					break;
 				case CURRENT_GROUP_EMERG_TYPE:
 					dataInfo[1] = AI_SERVICE_TYPE.AUDIO_GROUP_CALL.ordinal();
 					dataInfo[3] = defaultJoinedGroupObj.getGroupId();
+					requestJoinInEmergGroup(callNumber);
 					break;
 				default:
 					break;
@@ -197,8 +199,8 @@ public class IntercomApplication extends Application {
 		}
 		int[] dataInfo ;
 		if( keyCode == Constants.EMERG_KEY && emergType == EMERG_TYPE.POINT_CALL_EMERG_TYPE){
-			//intercom.hangupWaitingOrBackground( mHandler
-			//		.obtainMessage(Constants.RIL_REQUEST_HANGUP_WAITING_OR_BACKGROUND));
+			intercom.hangupPointCall( mHandler
+				.obtainMessage(Constants.RIL_REQUEST_HANGUP_WAITING_OR_BACKGROUND));			
 			return;
 		}
 		
@@ -321,7 +323,12 @@ public class IntercomApplication extends Application {
 					String isGroup = notificationCallInfo[7] == 0 ? " is group call"
 							: " is not group call. ";
 					statusStr = canGrab + isGroup + "call Id: "
-							+ notificationCallInfo[4] + " incoming call.";
+							+ notificationCallInfo[4] + " incoming call. " ;
+					if( notificationCallInfo[6] == CALL_PRIORITY_TYPE.PRIORITY_0.ordinal()){
+						statusStr += " current call is emerg call. ";
+					}else{
+						statusStr += "priority: "+notificationCallInfo[6];
+					}
 					
 					setInCallGroup(notificationCallInfo[4]);
 					
@@ -911,6 +918,22 @@ public class IntercomApplication extends Application {
 				mHandler.obtainMessage(Constants.RIL_REQUEST_PTT_GROUP_SETUP));
 		defaultJoinedGroupObj = groupObj;
 		defaultJoinedGroupObj.setJoinedSuccess(false);
+	}
+	
+	private void requestJoinInEmergGroup(int groupId){
+		GroupObject groupObj = null;
+		for(int index=0;index<groupObjList.size();index++){
+			if(groupId == groupObjList.get(index).getGroupId() ){
+				groupObj = groupObjList.get(index);
+			}
+		}
+		
+		if( null != groupObj){
+			int[] groupInfo = new int[] { groupObj.getGroupId(), CALL_PRIORITY_TYPE.PRIORITY_0.ordinal(),
+					1 };
+			intercom.joinInGroup(groupInfo,
+					mHandler.obtainMessage(Constants.RIL_REQUEST_PTT_GROUP_SETUP));
+		}
 	}
 	
 	public void requestCloseGroup(int groupId){
